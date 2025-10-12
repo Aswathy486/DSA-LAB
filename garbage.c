@@ -42,7 +42,8 @@ void freeBlock(int pos) {
     if (t && !t->free) {
         t->free = 1;
         printf("Freed block %d\n", pos);
-    } else printf("Invalid block %d\n", pos);
+    } else
+        printf("Invalid block %d\n", pos);
 }
 
 void gc() {
@@ -54,8 +55,53 @@ void gc() {
             t->next = tmp->next;
             if (tmp->next) tmp->next->prev = t;
             free(tmp);
-        } else t = t->next;
+        } else
+            t = t->next;
     }
+}
+
+// New compaction function
+void compact() {
+    struct Block *t = head, *newHead = NULL, *lastUsed = NULL;
+    int totalFreeSize = 0;
+
+    // Build new list with only used blocks
+    while (t) {
+        if (!t->free) {
+            struct Block *newBlock = malloc(sizeof(struct Block));
+            newBlock->size = t->size;
+            newBlock->free = 0;
+            newBlock->prev = lastUsed;
+            newBlock->next = NULL;
+            if (lastUsed) lastUsed->next = newBlock;
+            else newHead = newBlock;
+            lastUsed = newBlock;
+        } else {
+            totalFreeSize += t->size;
+        }
+        t = t->next;
+    }
+
+    // Add one big free block if there is free space
+    if (totalFreeSize > 0) {
+        struct Block *freeBlock = malloc(sizeof(struct Block));
+        freeBlock->size = totalFreeSize;
+        freeBlock->free = 1;
+        freeBlock->prev = lastUsed;
+        freeBlock->next = NULL;
+        if (lastUsed) lastUsed->next = freeBlock;
+        else newHead = freeBlock;  // all blocks free scenario
+    }
+
+    // Free old list
+    t = head;
+    while (t) {
+        struct Block *tmp = t;
+        t = t->next;
+        free(tmp);
+    }
+
+    head = newHead;
 }
 
 void display() {
@@ -74,7 +120,8 @@ int main() {
     scanf("%d", &nb);
     int b[nb];
     printf("Enter sizes of each block:\n");
-    for (int i = 0; i < nb; i++) scanf("%d", &b[i]);
+    for (int i = 0; i < nb; i++)
+        scanf("%d", &b[i]);
     create(b, nb);
 
     printf("Enter number of processes: ");
@@ -103,4 +150,10 @@ int main() {
     gc();
     printf("\nAfter GC:");
     display();
+
+    printf("\nAfter Compaction:");
+    compact();
+    display();
+
+    return 0;
 }
