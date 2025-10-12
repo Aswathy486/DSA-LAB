@@ -6,81 +6,104 @@ struct Node {
     struct Node *left, *right;
 };
 
-struct Node* newNode(int x) {
-    struct Node* n = malloc(sizeof(struct Node));
-    n->data = x;
-    n->left = n->right = NULL;
-    return n;
+struct Node* createNode(int data) {
+    struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->left = newNode->right = NULL;
+    return newNode;
 }
 
-struct Node* insert(struct Node* r, int x) {
-    if (!r) return newNode(x);
-    if (x < r->data) r->left = insert(r->left, x);
-    else if (x > r->data) r->right = insert(r->right, x);
-    return r;
+struct Node* insert(struct Node* root, int data) {
+    if (root == NULL)
+        return createNode(data);
+    if (data < root->data)
+        root->left = insert(root->left, data);
+    else if (data > root->data)
+        root->right = insert(root->right, data);
+    return root;
 }
 
-struct Node* minValue(struct Node* n) {
-    while (n->left) n = n->left;
-    return n;
+struct Node* search(struct Node* root, int key) {
+    if (root == NULL || root->data == key)
+        return root;
+    if (key < root->data)
+        return search(root->left, key);
+    return search(root->right, key);
 }
 
-struct Node* delete(struct Node* r, int x) {
-    if (!r) return r;
-    if (x < r->data) r->left = delete(r->left, x);
-    else if (x > r->data) r->right = delete(r->right, x);
+struct Node* findMin(struct Node* root) {
+    while (root->left != NULL)
+        root = root->left;
+    return root;
+}
+
+struct Node* deleteNode(struct Node* root, int key) {
+    if (root == NULL)
+        return root;
+    if (key < root->data)
+        root->left = deleteNode(root->left, key);
+    else if (key > root->data)
+        root->right = deleteNode(root->right, key);
     else {
-        if (!r->left) {
-            struct Node* t = r->right; free(r); return t;
-        } else if (!r->right) {
-            struct Node* t = r->left; free(r); return t;
+        if (root->left == NULL) {
+            struct Node *temp = root->right;
+            free(root);
+            return temp;
+        } else if (root->right == NULL) {
+            struct Node *temp = root->left;
+            free(root);
+            return temp;
         }
-        struct Node* t = minValue(r->right);
-        r->data = t->data;
-        r->right = delete(r->right, t->data);
+        struct Node* temp = findMin(root->right);
+        root->data = temp->data;
+        root->right = deleteNode(root->right, temp->data);
     }
-    return r;
+    return root;
 }
 
-void inorder(struct Node* r) {
-    if (r) {
-        inorder(r->left);
-        printf("%d ", r->data);
-        inorder(r->right);
+void inorder(struct Node* root) {
+    if (root != NULL) {
+        inorder(root->left);
+        printf("%d ", root->data);
+        inorder(root->right);
     }
-}
-
-int search(struct Node* r, int x) {
-    if (!r) return 0;
-    if (r->data == x) return 1;
-    else if (x < r->data) return search(r->left, x);
-    else return search(r->right, x);
 }
 
 int main() {
-    struct Node* root = NULL;
-    int n, val, s, d;
+    struct Node *root = NULL;
+    int choice, data, key;
 
-    printf("Enter number of elements: ");
-    scanf("%d", &n);
-    printf("Enter elements: ");
-    for (int i = 0; i < n; i++) {
-        scanf("%d", &val);
-        root = insert(root, val);
+printf("\n1. Insert\n2. Search\n3. Delete\n4. Display \n5. Exit");
+    while (1) {
+        printf("\nEnter your choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                printf("Enter data: ");
+                scanf("%d", &data);
+                root = insert(root, data);
+                break;
+            case 2:
+                printf("Enter key to search: ");
+                scanf("%d", &key);
+                if (search(root, key))
+                    printf("Key found!\n");
+                else
+                    printf("Key not found!\n");
+                break;
+            case 3:
+                printf("Enter key to delete: ");
+                scanf("%d", &key);
+                root = deleteNode(root, key);
+                break;
+            case 4:
+                printf("Inorder Traversal: ");
+                inorder(root);
+                printf("\n");
+                break;
+            case 5:
+            printf("Exited\n");
+                exit(0);
+        }
     }
-
-    printf("Inorder traversal: ");
-    inorder(root);
-
-    printf("\nEnter value to search: ");
-    scanf("%d", &s);
-    if (search(root, s)) printf("Found\n"); else printf("Not found\n");
-
-    printf("Enter value to delete: ");
-    scanf("%d", &d);
-    root = delete(root, d);
-
-    printf("Inorder after deletion: ");
-    inorder(root);
-    printf("\n");
 }
