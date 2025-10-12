@@ -1,41 +1,38 @@
-#include <stdio.h>
-
-int binarySearch(int a[], int n, int key, int *comparisons) {
-    int l = 0, r = n - 1;
-    *comparisons = 0;  
-
-    while (l <= r) {
-        int m = (l + r) / 2;
-        (*comparisons)++;  
-        if (a[m] == key) return m;
-        else if (a[m] < key) l = m + 1;
-        else r = m - 1;
-    }
-    return -1;
-}
-
-int main() {
-    int n, key, comps;
-    printf("Enter number of elements: ");
-    scanf("%d", &n);
-
-    int a[n];
-    printf("Enter sorted elements: ");
-    for (int i = 0; i < n; i++) scanf("%d", &a[i]);
-
-    printf("Enter element to search: ");
-    scanf("%d", &key);
-
-    int pos = binarySearch(a, n, key, &comps);
-
-    if (pos != -1)
-        printf("Element found at index %d\n", pos);
-    else
-        printf("Element not found\n");
-
-    printf("Number of comparisons (Time Complexity steps): %d\n", comps);
-
-    
-    int space = sizeof(a) + sizeof(n) + sizeof(key) + sizeof(comps);
-    printf("Estimated Space Used (bytes): %d\n", space);
-}
+#include <stdio.h> 
+int main() { 
+    int arr[100], n, key, low, high, mid, flag = 0, comparisons = 0; 
+    printf("Enter number of elements: "); 
+    scanf("%d", &n); 
+    printf("Enter elements in sorted order:\n"); 
+    for (int i = 0; i < n; i++) 
+        scanf("%d", &arr[i]); 
+    printf("Enter element to search: "); 
+    scanf("%d", &key); 
+    low = 0; 
+    high = n - 1; 
+    while (low <= high) { 
+        mid = (low + high) / 2; 
+        comparisons++;  
+        if (arr[mid] == key) { 
+            printf("Element %d found at position %d.\n", key, mid + 1); 
+            flag = 1; 
+            break; 
+        } 
+        else if (key < arr[mid]) 
+            high = mid - 1; 
+        else 
+            low = mid + 1; 
+    } 
+    if (flag == 0) 
+        printf("Element not found.\n"); 
+printf("\n COMPLEXITY ANALYSIS\n"); 
+if (comparisons == 1) 
+printf("Best Case: Element found at mid in first comparison → O(1)\n"); 
+else if (flag == 1) 
+printf("Average Case: Element found after %d comparisons → O(log n)\n", comparisons); 
+else 
+printf("Worst Case: Element not found after %d comparisons → O(log n)\n", comparisons); 
+printf("Total Comparisons Made: %d\n", comparisons); 
+printf("Space Complexity: O(1)\n"); 
+return 0; 
+} 
