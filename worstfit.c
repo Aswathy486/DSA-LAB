@@ -32,18 +32,21 @@ void alloc(int s) {
         t = t->next;
     }
     if (worst) {
-        worst->free = 0;
-        printf("Allocated process %d in block %d\n", s, worst->size);
-    } else
+        worst->size -= s;
+        if (worst->size == 0)
+            worst->free = 0;
+        printf("Allocated process %d, remaining block size: %d\n", s, worst->size);
+    } else {
         printf("No block found for %d\n", s);
+    }
 }
 
 void display() {
     struct Block *t = head;
     int i = 1;
-    printf("\nBlock\tSize\tStatus\n");
+    printf("\nBlock\tRemaining Size\tStatus\n");
     while (t) {
-        printf("%d\t%d\t%s\n", i++, t->size, t->free ? "Free" : "Used");
+        printf("%d\t%d\t\t%s\n", i++, t->size, t->free ? "Free" : "Used");
         t = t->next;
     }
 }
@@ -67,4 +70,6 @@ int main() {
     }
     printf("Using Worst fit memory allocation:\n");
     display();
+
+    return 0;
 }
