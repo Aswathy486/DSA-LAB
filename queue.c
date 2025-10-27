@@ -1,86 +1,66 @@
-
 #include <stdio.h>
-#define SIZE 5
+#define MAX 5
 
-
-int queue[SIZE];
+int queue[MAX];
 int front = -1, rear = -1;
 
-
+// Function to add an element to the rear of the queue
 void enqueue(int val) {
-   if (rear == SIZE - 1) {
-       printf("Queue is full!\n");
-   } else {
-       if (front == -1) front = 0;
-       rear++;
-       queue[rear] = val;
-       printf("%d enqueued\n", val);
-   }
+    if (rear == MAX - 1) {
+        printf("Queue Overflow! Cannot insert %d.\n", val);
+        return;
+    }
+    // Initialize front for the very first element
+    if (front == -1) {
+        front = 0;
+    }
+    queue[++rear] = val;
+    printf("%d enqueued.\n", val);
 }
 
-
-void dequeue() {
-   if (front == -1 || front > rear) {
-       printf("Queue is empty!\n");
-   } else {
-       printf("%d dequeued\n", queue[front]);
-       front++;
-       if (front > rear) front = rear = -1;
-   }
+// Function to remove an element from the front of the queue
+int dequeue() {
+    if (front == -1 || front > rear) {
+        printf("Queue Underflow!\n");
+        return -1; // Indicate failure
+    }
+    int val = queue[front++];
+    // Reset queue state if the last element was removed
+    if (front > rear) {
+        front = rear = -1;
+    }
+    return val;
 }
-
 
 void display() {
-   if (front == -1) {
-       printf("Queue is empty!\n");
-   } else {
-       printf("Queue: ");
-       for (int i = front; i <= rear; i++) {
-           printf("%d ", queue[i]);
-       }
-       printf("\n");
-   }
+    if (front == -1) {
+        printf("Queue is empty.\n");
+        return;
+    }
+    printf("Queue elements (Front to Rear): ");
+    for (int i = front; i <= rear; i++) {
+        printf("%d ", queue[i]);
+    }
+    printf("\n");
 }
-
-
-void peek() {
-   if (front == -1) {
-       printf("Queue is empty!\n");
-   } else {
-       printf("Front element: %d\n", queue[front]);
-   }
-}
-
 
 int main() {
-   int choice, val;
+    printf("--- Standard Queue Demo ---\n");
+    enqueue(10);
+    enqueue(20);
+    enqueue(30);
+    display();
 
+    printf("Dequeued element: %d\n", dequeue());
+    display();
 
-   while (1) {
-       printf("\n1.Enqueue 2.Dequeue 3.Display 4.Peek 5.Exit\n");
-       printf("Enter choice: ");
-       scanf("%d", &choice);
+    enqueue(40);
+    enqueue(50);
+    enqueue(60); // Should show Overflow
 
+    printf("Dequeued element: %d\n", dequeue());
+    printf("Dequeued element: %d\n", dequeue());
+    display();
 
-       switch (choice) {
-           case 1:
-               printf("Enter value: ");
-               scanf("%d", &val);
-               enqueue(val);
-               break;
-           case 2:
-               dequeue();
-               break;
-           case 3:
-               display();
-               break;
-           case 4:
-               peek();
-               break;
-           case 5:
-               return 0;
-           default:
-               printf("Invalid choice!\n");
-       }
-   }
+    return 0;
 }
