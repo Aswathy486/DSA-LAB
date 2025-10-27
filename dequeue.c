@@ -1,70 +1,120 @@
-
 #include <stdio.h>
 #define MAX 5
 
-int dq[MAX], front = -1, rear = -1;
+int deque[MAX];
+int front = -1, rear = -1;
+
+// --- Insertion Operations ---
 
 void insertFront(int val) {
-    if ((front == 0 && rear == MAX - 1) || (front == rear + 1)) {
-        printf("Deque full!\n"); return;
+    // Check for full condition
+    if (front == 0 && rear == MAX - 1) {
+        printf("Deque full! Cannot insert %d.\n", val);
+        return;
     }
-    if (front == -1) front = rear = 0;
-    else if (front == 0) front = MAX - 1;
-    else front--;
-    dq[front] = val;
-    printf("%d inserted at front\n", val);
+    // Check if there is space to move back in a linear array
+    if (front == 0 && rear != -1) {
+        printf("Front boundary reached. Cannot insert %d at front.\n", val);
+        return;
+    }
+    // Initialization
+    if (front == -1) {
+        front = rear = 0;
+    }
+    // Normal move backward
+    else {
+        front--;
+    }
+    deque[front] = val;
+    printf("Inserted %d at front.\n", val);
 }
 
 void insertRear(int val) {
-    if ((front == 0 && rear == MAX - 1) || (front == rear + 1)) {
-        printf("Deque full!\n"); return;
+    // Check for full condition
+    if (front == 0 && rear == MAX - 1) {
+        printf("Deque full! Cannot insert %d.\n", val);
+        return;
     }
-    if (rear == -1) front = rear = 0;
-    else if (rear == MAX - 1) rear = 0;
-    else rear++;
-    dq[rear] = val;
-    printf("%d inserted at rear\n", val);
+    // Initialization
+    if (rear == -1) {
+        front = rear = 0;
+    }
+    // Normal move forward
+    else {
+        rear++;
+    }
+    deque[rear] = val;
+    printf("Inserted %d at rear.\n", val);
 }
 
-void deleteFront() {
-    if (front == -1) { printf("Deque empty!\n"); return; }
-    printf("%d deleted from front\n", dq[front]);
-    if (front == rear) front = rear = -1;
-    else if (front == MAX - 1) front = 0;
-    else front++;
+// --- Deletion Operations ---
+
+int deleteFront() {
+    if (front == -1) {
+        printf("Deque empty!\n");
+        return -1;
+    }
+    int val = deque[front];
+    // Reset if last element
+    if (front == rear) {
+        front = rear = -1;
+    }
+    // Normal move forward
+    else {
+        front++;
+    }
+    return val;
 }
 
-void deleteRear() {
-    if (rear == -1) { printf("Deque empty!\n"); return; }
-    printf("%d deleted from rear\n", dq[rear]);
-    if (front == rear) front = rear = -1;
-    else if (rear == 0) rear = MAX - 1;
-    else rear--;
+int deleteRear() {
+    if (rear == -1) {
+        printf("Deque empty!\n");
+        return -1;
+    }
+    int val = deque[rear];
+    // Reset if last element
+    if (front == rear) {
+        front = rear = -1;
+    }
+    // Normal move backward
+    else {
+        rear--;
+    }
+    return val;
 }
 
 void display() {
-    if (front == -1) { printf("Deque is empty\n"); return; }
-    int i = front;
-    printf("Deque: ");
-    while (1) {
-        printf("%d ", dq[i]);
-        if (i == rear) break;
-        i = (i + 1) % MAX;
+    if (front == -1) {
+        printf("Deque is empty.\n");
+        return;
+    }
+    printf("Deque elements (Front to Rear): ");
+    for (int i = front; i <= rear; i++) {
+        printf("%d ", deque[i]);
     }
     printf("\n");
 }
 
 int main() {
-    int ch, v;
-    do {
-        printf("\n1.Insert Front  2.Insert Rear  3.Delete Front  4.Delete Rear  5.Display  6.Exit\n");
-        printf("Enter choice: ");
-        scanf("%d", &ch);
-        if (ch == 1) { printf("Value: "); scanf("%d", &v); insertFront(v); }
-        else if (ch == 2) { printf("Value: "); scanf("%d", &v); insertRear(v); }
-        else if (ch == 3) deleteFront();
-        else if (ch == 4) deleteRear();
-        else if (ch == 5) display();
-        else if (ch != 6) printf("Invalid choice!\n");
-    } while (ch != 6);
+    printf("--- Double-Ended Queue (Deque) Demo ---\n");
+
+    insertRear(100);
+    insertFront(90);
+    insertFront(80);
+    display();
+
+    printf("Deleted Front: %d\n", deleteFront());
+    display();
+    
+    printf("Deleted Rear: %d\n", deleteRear());
+    display();
+
+    insertRear(200);
+    insertRear(300);
+    insertRear(400); // Should show full or boundary message
+    display();
+    
+    insertFront(70); // Should show front boundary reached
+    
+    return 0;
 }
